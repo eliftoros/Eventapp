@@ -1,17 +1,3 @@
-let array = [1, 2, 3, 2, 5, 1];
-function findDuplicates(array){
-    let repeat = array[0];
-    for (let i = 0; i < array.length; i++){
-        if (array[i] = repeat
-    }
-
-}
-
-
-
-
-
-
 function findDuplicates(arr) {
   const duplicates = [];
   for (let i = 0; i < arr.length; i++) {
