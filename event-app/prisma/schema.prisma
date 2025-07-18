@@ -1,0 +1,82 @@
+
+
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+
+  events       Event[] // Kullanıcının oluşturduğu etkinlikler
+  participants EventParticipant[] // Kullanıcının katıldığı etkinlikler
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  date        DateTime
+  userId      Int
+  categoryId  Int
+  cityId      Int
+  locationId  Int?
+
+  user         User               @relation(fields: [userId], references: [id])
+  category     Category           @relation(fields: [categoryId], references: [id])
+  city         City               @relation(fields: [cityId], references: [id])
+  location     Location?          @relation(fields: [locationId], references: [id])
+  participants EventParticipant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
+  events    Event[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model City {
+  id        Int      @id @default(autoincrement())
+  name      String
+  events    Event[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Location {
+  id        Int      @id @default(autoincrement())
+  address   String
+  events    Event[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EventParticipant {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  eventId   Int
+  user      User     @relation(fields: [userId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, eventId]) // Aynı kullanıcı aynı etkinliğe iki kez eklenmesin
+}
+
