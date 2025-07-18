@@ -51,5 +51,3 @@ exports.profile = async (req, res) => {
     res.status(500).json({ error: 'Profil alınamadı' });
   }
 };
- git config --global user.name "Elif Toros"
-$ git config --global user.email eliftoros1@gmail.com
