@@ -3,7 +3,7 @@ const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Tüm etkinlikleri getir
+
 router.get('/', async (req, res) => {
   try {
     const events = await prisma.event.findMany({
@@ -21,15 +21,26 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Yeni etkinlik ekle
+
 router.post('/', async (req, res) => {
-  const { title, description, date, userId, categoryId, cityId, locationId } = req.body;
+  let { name, title, description, date, userId, categoryId, cityId, locationId } = req.body;
+
+  if (!name || !date || !userId || !categoryId || !cityId) {
+    return res.status(400).json({ error: 'name, date, userId, categoryId ve cityId alanları zorunludur.' });
+  }
+
+  const eventDate = new Date(date);
+  if (isNaN(eventDate)) {
+    return res.status(400).json({ error: 'Geçersiz tarih formatı.' });
+  }
+
   try {
     const newEvent = await prisma.event.create({
       data: {
+        name,
         title,
         description,
-        date: new Date(date),
+        date: eventDate,
         userId,
         categoryId,
         cityId,

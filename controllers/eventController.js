@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Tüm Eventleri Listele
+
 exports.getEvents = async (req, res) => {
   try {
     const { categoryId, cityId } = req.query;
@@ -19,7 +19,6 @@ exports.getEvents = async (req, res) => {
   }
 };
 
-// Tek Event Getir
 exports.getEvent = async (req, res) => {
   const { id } = req.params;
   try {
@@ -34,7 +33,7 @@ exports.getEvent = async (req, res) => {
   }
 };
 
-// Yeni Event Oluştur
+
 exports.createEvent = async (req, res) => {
   const { title, description, date, categoryId, cityId } = req.body;
   try {
@@ -54,7 +53,6 @@ exports.createEvent = async (req, res) => {
   }
 };
 
-// Event Güncelle
 exports.updateEvent = async (req, res) => {
   const { id } = req.params;
   const { title, description, date, categoryId, cityId } = req.body;
@@ -73,7 +71,7 @@ exports.updateEvent = async (req, res) => {
   }
 };
 
-// Event Sil
+
 exports.deleteEvent = async (req, res) => {
   const { id } = req.params;
   try {

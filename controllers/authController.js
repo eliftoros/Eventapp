@@ -6,7 +6,7 @@ require('dotenv').config();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
-// Kullanıcı Kaydı
+
 exports.register = async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -25,7 +25,7 @@ exports.register = async (req, res) => {
   }
 };
 
-// Kullanıcı Girişi
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -42,7 +42,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// Profil bilgisi
+
 exports.profile = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: req.user.id } });

@@ -3,7 +3,6 @@ const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Tüm kullanıcıları getir
 router.get('/', async (req, res) => {
   try {
     const users = await prisma.user.findMany();
@@ -13,7 +12,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Yeni kullanıcı ekle
+
 router.post('/', async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -26,7 +25,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Kullanıcı sil
+
 router.delete('/:id', async (req, res) => {
   const id = parseInt(req.params.id);
   try {
