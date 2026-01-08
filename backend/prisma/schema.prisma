@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id               Int                @id @default(autoincrement())
+  name             String
+  email            String             @unique
+  password         String
+  role             Role               @default(USER)
+  events           Event[]            @relation("UserEvents")
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  EventParticipant EventParticipant[]
+}
+
+model City {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  events    Event[]    @relation("CityEvents")
+  locations Location[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Location {
+  id        Int      @id @default(autoincrement())
+  address   String
+  cityId    Int
+  city      City     @relation(fields: [cityId], references: [id])
+  events    Event[]  @relation("LocationEvents")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  name        String
+  title       String?
+  description String?
+  date        DateTime
+  imageUrl    String?
+  userId      Int
+  categoryId  Int
+  cityId      Int
+  locationId  Int?
+
+  user         User               @relation("UserEvents", fields: [userId], references: [id])
+  city         City               @relation("CityEvents", fields: [cityId], references: [id])
+  location     Location?          @relation("LocationEvents", fields: [locationId], references: [id])
+  category     Category           @relation(fields: [categoryId], references: [id])
+  participants EventParticipant[]
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  events    Event[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EventParticipant {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  eventId   Int
+  user      User     @relation(fields: [userId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, eventId])
+}
+
+enum Role {
+  USER
+  ORGANIZER
+}
