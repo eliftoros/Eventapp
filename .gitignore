@@ -44,3 +44,8 @@ backend/uploads/
 
 # Generated
 /generated/prisma
+
+# Documentation (local notes)
+DUZELTMELER.md
+ORGANIZATOR_DUZELTMELER.md
+YENI_OZELLIKLER.md
