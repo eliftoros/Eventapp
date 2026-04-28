@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, ConflictException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -91,6 +91,17 @@ export class EventsService {
   }
 
   async joinEvent(userId: number, eventId: number) {
+    const existingParticipant = await this.prisma.eventParticipant.findFirst({
+      where: {
+        userId,
+        eventId,
+      },
+    });
+
+    if (existingParticipant) {
+      throw new ConflictException('You have already joined this event');
+    }
+
     return this.prisma.eventParticipant.create({
       data: {
         userId,
