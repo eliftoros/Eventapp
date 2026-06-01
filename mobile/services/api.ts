@@ -1,9 +1,11 @@
 import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from './storage';
+import { Platform } from 'react-native';
 
-// Lütfen bilgisayarınızın yerel IP adresini (veya backend'in çalıştığı IP'yi) girin.
 // Backend .env dosyasında PORT=3000 olduğu için 3000'i kullanıyoruz.
-const BASE_URL = 'http://10.242.3.134:3000';
+export const BASE_URL = Platform.OS === 'web' 
+  ? 'http://localhost:3000' 
+  : 'http://192.168.1.9:3000';
 
 const api = axios.create({
   baseURL: BASE_URL,

@@ -1,33 +1,58 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { BlurView } from 'expo-blur';
+import { Platform, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: '#3b82f6',
+        tabBarInactiveTintColor: '#71717a',
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarStyle: Platform.select({
+          ios: {
+            position: 'absolute',
+            backgroundColor: 'rgba(9, 9, 11, 0.8)',
+            borderTopWidth: 0,
+            elevation: 0,
+          },
+          default: {
+            backgroundColor: '#09090b',
+            borderTopColor: '#27272a',
+            elevation: 0,
+          },
+        }),
+        tabBarBackground: () => 
+          Platform.OS === 'ios' ? (
+            <BlurView intensity={80} tint="dark" style={{ flex: 1 }} />
+          ) : (
+            <View style={{ flex: 1, backgroundColor: '#09090b' }} />
+          ),
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Etkinlikler',
+          tabBarIcon: ({ color }) => <Ionicons size={24} name="compass" color={color} />,
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Keşfet',
+          tabBarIcon: ({ color }) => <Ionicons size={24} name="search" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profilim',
+          tabBarIcon: ({ color }) => <Ionicons size={24} name="person" color={color} />,
         }}
       />
     </Tabs>

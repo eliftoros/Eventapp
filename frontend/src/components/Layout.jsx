@@ -38,6 +38,11 @@ export default function Layout() {
                                 <div className="flex items-center gap-2 text-zinc-400">
                                     <User className="w-4 h-4" />
                                     <span className="text-sm font-medium text-white">{user.name}</span>
+                                    {user.isPremium && (
+                                        <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 font-extrabold tracking-wider flex items-center gap-1">
+                                            👑 PREMIUM
+                                        </span>
+                                    )}
                                     <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-800 border border-zinc-700 uppercase tracking-wider">{user.role}</span>
                                 </div>
                                 <button onClick={handleLogout} className="text-sm font-medium text-zinc-400 hover:text-white transition-colors flex items-center gap-2">

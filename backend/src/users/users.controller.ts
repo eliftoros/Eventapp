@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request, Patch, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards, Request, Patch, Body, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -11,8 +11,8 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) { }
 
     @Get('profile')
-    getProfile(@Request() req: any) {
-        return req.user;
+    async getProfile(@Request() req: any) {
+        return this.usersService.findById(req.user.id);
     }
 
     @Get()
@@ -25,5 +25,10 @@ export class UsersController {
     @Roles(Role.ORGANIZER)
     updateRole(@Param('id') id: string, @Body('role') role: Role) {
         return this.usersService.updateRole(+id, role);
+    }
+
+    @Post('premium/upgrade')
+    upgradePremium(@Request() req: any) {
+        return this.usersService.upgradeToPremium(req.user.id);
     }
 }

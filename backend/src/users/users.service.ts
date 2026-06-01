@@ -33,4 +33,31 @@ export class UsersService {
             }
         });
     }
+
+    async findById(id: number) {
+        return this.prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                isPremium: true,
+            }
+        });
+    }
+
+    async upgradeToPremium(id: number) {
+        return this.prisma.user.update({
+            where: { id },
+            data: { isPremium: true },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                isPremium: true,
+            }
+        });
+    }
 }

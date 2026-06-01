@@ -22,7 +22,8 @@ export class EventsService {
       include: {
         city: true,
         location: true,
-        user: { select: { name: true } }
+        user: { select: { name: true } },
+        participants: true
       }
     });
   }
