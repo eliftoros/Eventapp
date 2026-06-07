@@ -148,7 +148,7 @@ export default function Home() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
-                        className="card group hover:scale-[1.02] transition-transform duration-300"
+                        className={`card group hover:scale-[1.02] transition-all duration-300 relative ${event.user?.isPremium ? 'border-2 border-amber-500/30 shadow-lg shadow-amber-500/5' : ''}`}
                     >
                         <div className="aspect-video bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
                             {event.imageUrl ? (
@@ -162,9 +162,16 @@ export default function Home() {
                             )}
                         </div>
                         <div className="flex justify-between items-start mb-2">
-                            <span className="text-xs font-semibold px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                                {event.city?.name || 'Online'}
-                            </span>
+                            <div className="flex gap-2">
+                                <span className="text-xs font-semibold px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                    {event.city?.name || 'Online'}
+                                </span>
+                                {event.user?.isPremium && (
+                                    <span className="text-[10px] font-bold px-2 py-1 rounded bg-amber-500/15 text-amber-500 border border-amber-500/30 flex items-center gap-1">
+                                        <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" /> Featured
+                                    </span>
+                                )}
+                            </div>
                             <span className="text-xs text-zinc-500">{new Date(event.date).toLocaleDateString()}</span>
                         </div>
                         <h3 className="text-lg font-bold mb-2 text-white group-hover:text-primary transition-colors">{event.name}</h3>

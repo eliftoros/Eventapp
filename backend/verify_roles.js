@@ -29,8 +29,8 @@ async function verify() {
     const password = 'password123';
 
     console.log('--- 1. Registering Users ---');
-    // Register Admin (assuming first user or role assumption works, passing role ADMIN)
-    await request('POST', '/auth/register', null, { email: adminEmail, password, name: 'Admin', role: 'ADMIN' });
+    // Register Admin with ORGANIZER role so they have administrative privileges (since NestJS only has USER and ORGANIZER roles)
+    await request('POST', '/auth/register', null, { email: adminEmail, password, name: 'Admin', role: 'ORGANIZER' });
     await request('POST', '/auth/register', null, { email: orgEmail, password, name: 'Org', role: 'USER' }); // Explicitly USER, to be promoted
     await request('POST', '/auth/register', null, { email: userEmail, password, name: 'User', role: 'USER' });
 

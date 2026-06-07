@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UseInterceptors, UploadedFile, ForbiddenException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -24,7 +24,10 @@ export class EventsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ORGANIZER)
   @UseInterceptors(FileInterceptor('image', multerConfig))
-  uploadImage(@UploadedFile() file: Express.Multer.File) {
+  uploadImage(@Request() req: any, @UploadedFile() file: Express.Multer.File) {
+    if (!req.user.isPremium) {
+      throw new ForbiddenException('Custom poster upload is a Premium feature. Please upgrade to Premium.');
+    }
     if (!file) {
       return { error: 'No file uploaded' };
     }
@@ -40,8 +43,9 @@ export class EventsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(+id);
+  @UseGuards(JwtAuthGuard)
+  findOne(@Param('id') id: string, @Request() req: any) {
+    return this.eventsService.findOne(+id, req.user);
   }
 
   @Post(':id/join')

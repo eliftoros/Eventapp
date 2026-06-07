@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: event_backend
+    ports:
+      - "3000:3000"
+    volumes:
+      # Persistent storage for SQLite database and uploaded images
+      - ./backend/prisma:/usr/src/app/prisma
+      - ./backend/uploads:/usr/src/app/uploads
+      
+      # Optional: Uncomment the lines below if you want backend development hot-reloading (removes production build requirement)
+      # - ./backend:/usr/src/app
+      # - /usr/src/app/node_modules
+    environment:
+      - PORT=3000
+      - JWT_SECRET=supersecretkey
+      - NODE_ENV=development
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: event_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      # Bind mount frontend source files for live-reload / HMR during styling and component edits
+      - ./frontend:/usr/src/app
+      # Anonymous volume to protect the container's node_modules from host overrides
+      - /usr/src/app/node_modules
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    restart: unless-stopped

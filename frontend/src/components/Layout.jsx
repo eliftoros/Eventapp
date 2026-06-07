@@ -34,6 +34,11 @@ export default function Layout() {
                                             My Events
                                         </Link>
                                     )}
+                                    {user.role === 'USER' && (
+                                        <Link to="/joined-events" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">
+                                            My Joined Events
+                                        </Link>
+                                    )}
                                 </div>
                                 <div className="flex items-center gap-2 text-zinc-400">
                                     <User className="w-4 h-4" />

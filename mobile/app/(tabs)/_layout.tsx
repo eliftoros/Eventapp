@@ -49,6 +49,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="joined-events"
+        options={{
+          title: 'Etkinliklerim',
+          tabBarIcon: ({ color }) => <Ionicons size={24} name="calendar" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profilim',

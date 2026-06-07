@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import EventManagement from './pages/EventManagement';
+import JoinedEvents from './pages/JoinedEvents';
 import { useAuth } from './context/AuthContext';
 
 function PrivateRoute({ children, allowedRoles }) {
@@ -32,6 +33,11 @@ function App() {
         <Route path="events" element={
           <PrivateRoute allowedRoles={['ORGANIZER']}>
             <EventManagement />
+          </PrivateRoute>
+        } />
+        <Route path="joined-events" element={
+          <PrivateRoute allowedRoles={['USER']}>
+            <JoinedEvents />
           </PrivateRoute>
         } />
       </Route>

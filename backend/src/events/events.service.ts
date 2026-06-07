@@ -7,7 +7,38 @@ import { PrismaService } from '../prisma/prisma.service';
 export class EventsService {
   constructor(private prisma: PrismaService) { }
 
-  create(userId: number, createEventDto: CreateEventDto) {
+  async create(userId: number, createEventDto: CreateEventDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.role === 'ORGANIZER' && !user.isPremium) {
+      if (createEventDto.imageUrl) {
+        throw new ForbiddenException('Custom poster is a Premium feature. Please upgrade to Premium.');
+      }
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+      const createdThisMonth = await this.prisma.event.count({
+        where: {
+          userId,
+          createdAt: {
+            gte: startOfMonth,
+            lte: endOfMonth,
+          },
+        },
+      });
+
+      if (createdThisMonth >= 3) {
+        throw new ForbiddenException('Free organizers can create at most 3 events per month. Please upgrade to Premium.');
+      }
+    }
+
     return this.prisma.event.create({
       data: {
         ...createEventDto,
@@ -17,26 +48,52 @@ export class EventsService {
     });
   }
 
-  findAll() {
-    return this.prisma.event.findMany({
+  async findAll() {
+    const events = await this.prisma.event.findMany({
       include: {
         city: true,
         location: true,
-        user: { select: { name: true } },
+        user: { select: { name: true, isPremium: true } },
         participants: true
       }
     });
+
+    return events.sort((a, b) => {
+      const aPremium = a.user?.isPremium ? 1 : 0;
+      const bPremium = b.user?.isPremium ? 1 : 0;
+      return bPremium - aPremium;
+    });
   }
 
-  findOne(id: number) {
-    return this.prisma.event.findUnique({
+  async findOne(id: number, requestingUser?: any) {
+    const event = await this.prisma.event.findUnique({
       where: { id },
       include: {
         city: true,
         location: true,
-        participants: { include: { user: { select: { name: true } } } }
+        participants: { include: { user: { select: { name: true, email: true } } } }
       }
     });
+
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${id} not found`);
+    }
+
+    const isOwner = requestingUser && event.userId === requestingUser.id;
+    const isAdmin = requestingUser && requestingUser.role === 'ADMIN';
+    const isOwnerPremium = isOwner && requestingUser.isPremium;
+
+    const result: any = { ...event };
+
+    // If the requester is not an Admin and not the Premium owner of this event, hide participant user details
+    if (!isAdmin && !isOwnerPremium) {
+      result.participants = event.participants.map(p => ({
+        ...p,
+        user: null
+      }));
+    }
+
+    return result;
   }
 
   async update(id: number, updateEventDto: UpdateEventDto, user: any) {
@@ -53,6 +110,11 @@ export class EventsService {
 
     if (user.role === 'USER') {
       throw new ForbiddenException('Users cannot update events');
+    }
+
+    // Check if free organizer tries to set/update custom image URL
+    if (user.role === 'ORGANIZER' && !user.isPremium && updateEventDto.imageUrl && updateEventDto.imageUrl !== event.imageUrl) {
+      throw new ForbiddenException('Custom poster is a Premium feature. Please upgrade to Premium.');
     }
 
     // Handling date conversion if present
@@ -92,6 +154,14 @@ export class EventsService {
   }
 
   async joinEvent(userId: number, eventId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
     const existingParticipant = await this.prisma.eventParticipant.findFirst({
       where: {
         userId,
@@ -101,6 +171,15 @@ export class EventsService {
 
     if (existingParticipant) {
       throw new ConflictException('You have already joined this event');
+    }
+
+    if (!user.isPremium) {
+      const joinedCount = await this.prisma.eventParticipant.count({
+        where: { userId },
+      });
+      if (joinedCount >= 3) {
+        throw new ForbiddenException('Free users can join at most 3 events. Please upgrade to Premium.');
+      }
     }
 
     return this.prisma.eventParticipant.create({

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, Image, Modal, TextInput, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -164,8 +165,10 @@ export default function EventListScreen() {
       }
     }
 
+    const isPremiumEvent = event.user?.isPremium;
+
     return (
-      <View className="bg-zinc-900/80 border border-zinc-800/60 rounded-3xl mb-6 overflow-hidden shadow-lg shadow-black/50">
+      <View className={`bg-zinc-900/80 border rounded-3xl mb-6 overflow-hidden shadow-lg shadow-black/50 ${isPremiumEvent ? 'border-amber-500/40 border-2' : 'border-zinc-800/60'}`}>
         {/* Etkinlik Görseli (Varsa) */}
         {imageUrl ? (
           <Image source={{ uri: imageUrl }} className="w-full h-48 bg-zinc-800" resizeMode="cover" />
@@ -180,15 +183,23 @@ export default function EventListScreen() {
         )}
 
         <View className="p-5">
-          <View className="flex-row justify-between items-start mb-3">
-            <View className="bg-blue-500/15 border border-blue-500/30 px-3 py-1.5 rounded-lg flex-row items-center">
-              <Ionicons name="location" size={14} color="#60a5fa" className="mr-1" />
-              <Text className="text-xs font-bold text-blue-400 ml-1">
-                {event.city?.name || 'Online'}
-              </Text>
+          <View className="flex-row justify-between items-center mb-3">
+            <View className="flex-row items-center">
+              <View className="bg-blue-500/15 border border-blue-500/30 px-3 py-1.5 rounded-lg flex-row items-center mr-2">
+                <Ionicons name="location" size={14} color="#60a5fa" />
+                <Text className="text-xs font-bold text-blue-400 ml-1">
+                  {event.city?.name || 'Online'}
+                </Text>
+              </View>
+              {isPremiumEvent && (
+                <View className="bg-amber-500/20 border border-amber-500/40 px-2 py-1 rounded-md flex-row items-center">
+                  <Ionicons name="star" size={10} color="#f59e0b" style={{ marginRight: 2 }} />
+                  <Text className="text-[10px] font-extrabold text-amber-500">ÖNE ÇIKAN</Text>
+                </View>
+              )}
             </View>
             <View className="bg-zinc-800/80 px-3 py-1.5 rounded-lg flex-row items-center">
-              <Ionicons name="calendar" size={14} color="#a1a1aa" className="mr-1" />
+              <Ionicons name="calendar" size={14} color="#a1a1aa" />
               <Text className="text-xs font-medium text-zinc-300 ml-1">
                 {new Date(event.date).toLocaleDateString('tr-TR')}
               </Text>
